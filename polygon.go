@@ -51,11 +51,35 @@ func (p *Polygon) Contains(point *Point) bool {
 	start := len(p.points) - 1
 	end := 0
 
-	contains := p.intersectsWithRaycast(point, p.points[start], p.points[end])
+	contains := false
 
-	for i := 1; i < len(p.points); i++ {
-		if p.intersectsWithRaycast(point, p.points[i-1], p.points[i]) {
-			contains = !contains
+	// This assumes polygon is non-intersecting and contains the same point to
+	// begin and end the polygon. If a point is repeated, it is assumed to
+	// complete the polygon. The first polygon is assumed to be the bounding
+	// polygon. All polygons that follow the bounding polygon are assumed to
+	// define a hole within the polygon and must have an ending point that
+	// equals the beginning point. If the first point does not match the last
+	// point, the polygon contains at least one hole.
+	//
+	// if there are no holes, we can use simpler and faster logic
+	if p.points[start] == p.points[end] {
+		for i := 1; i < len(p.points); i++ {
+			if p.intersectsWithRaycast(point, p.points[i-1], p.points[i]) {
+				contains = !contains
+			}
+		}
+	} else {
+		pt := p.points[0]
+		for i := 1; i < len(p.points); i++ {
+
+			// if true, we are transitioning to a hole, skip
+			if i != 1 && pt == p.points[i-1] {
+				pt = p.points[i-1]
+			} else {
+				if p.intersectsWithRaycast(point, p.points[i-1], p.points[i]) {
+					contains = !contains
+				}
+			}
 		}
 	}
 
