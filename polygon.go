@@ -62,7 +62,7 @@ func (p *Polygon) Contains(point *Point) bool {
 	// point, the polygon contains at least one hole.
 	//
 	// if there are no holes, we can use simpler and faster logic
-	if p.points[start] == p.points[end] {
+	if p.points[start].lat == p.points[end].lat && p.points[start].lng == p.points[end].lng {
 		for i := 1; i < len(p.points); i++ {
 			if p.intersectsWithRaycast(point, p.points[i-1], p.points[i]) {
 				contains = !contains
@@ -73,7 +73,7 @@ func (p *Polygon) Contains(point *Point) bool {
 		for i := 1; i < len(p.points); i++ {
 
 			// if true, we are transitioning to a hole, skip
-			if i != 1 && pt == p.points[i-1] {
+			if i != 1 && pt.lat == p.points[i-1].lat && pt.lng == p.points[i-1].lng {
 				pt = p.points[i-1]
 			} else {
 				if p.intersectsWithRaycast(point, p.points[i-1], p.points[i]) {
