@@ -70,11 +70,13 @@ func (p *Polygon) Contains(point *Point) bool {
 		}
 	} else {
 		pt := p.points[0]
+		ic := 1
 		for i := 1; i < len(p.points); i++ {
 
 			// if true, we are transitioning to a hole, skip
-			if i != 1 && pt.lat == p.points[i-1].lat && pt.lng == p.points[i-1].lng {
-				pt = p.points[i-1]
+			if i != ic && pt.lat == p.points[i-1].lat && pt.lng == p.points[i-1].lng {
+				pt = p.points[i]
+				ic = i + 1
 			} else {
 				if p.intersectsWithRaycast(point, p.points[i-1], p.points[i]) {
 					contains = !contains
